@@ -2,6 +2,7 @@ import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Event = (props) => {
   const [event, setEvent] = useState(props.event);
@@ -35,7 +36,9 @@ const Event = (props) => {
     <Card style={{ width: '18rem' }}>
       <Card.Img variant="top" src={event.nbTickets===0?"images/sold_out.png" :`images/${event.img}`} />
       <Card.Body>
+        <Link to={`/events/details/${event.name}`}>
         <Card.Title>{event.name}</Card.Title>
+        </Link>
         <Card.Text>
           price : {event.price}
         </Card.Text>
