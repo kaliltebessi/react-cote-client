@@ -1,5 +1,6 @@
 [
   {
+    "id": "1",
     "name": "Festival international de Carthage",
     "description": "Le lorem ipsum est, en imprimerie, une suite de mots sans signification utilisée à titre provisoire pour calibrer une mise en page",
     "img": "event1.jpg",
@@ -9,6 +10,7 @@
     "like": false
   },
   {
+    "id": "2",
     "name": "Festival de la médina de Tunis",
     "description": "Le lorem ipsum est, en imprimerie, une suite de mots sans signification utilisée à titre provisoire pour calibrer une mise en page",
     "img": "event2.jpg",
@@ -18,6 +20,7 @@
     "like": false
   },
   {
+    "id": "3",
     "name": "Journées cinématographiques de Carthage (JCC)",
     "description": "Le lorem ipsum est, en imprimerie, une suite de mots sans signification utilisée à titre provisoire pour calibrer une mise en page",
     "img": "event3.jpg",

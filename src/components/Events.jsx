@@ -1,11 +1,14 @@
-import ListEvent from '../data/events.json';
+
 import React, { useEffect, useState } from 'react';
 import Event from './Event';
+import { getallEvents } from '../service/api';
+import { deleteEvent } from '../service/api';
 const Events = () => {
 
   const [bookAlert , setBookAlert] = useState(false);
 
   const [showWelcome, setShowWelcome] = useState(false); 
+  const [ListEvent, setListEvent] = useState(null);
 
  useEffect(() => {
     setShowWelcome(true);
@@ -13,6 +16,37 @@ const Events = () => {
     return () => {
       console.log('componentWillUnmount');
       
+    }
+  }, []);
+
+  const deleteEvente = async (id) => { 
+    try {
+      await deleteEvent(id);
+      setListEvent(ListEvent.filter((event) => event.id !== id));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+
+
+  const fetchEvents = async () => {
+    try {
+      const events = await getallEvents();
+      setListEvent(events.data);
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+
+  }
+
+  useEffect(() => {
+    try {
+      fetchEvents();
+    } catch (error) {
+      console.log(error);
     }
   }, []);
 
@@ -40,7 +74,12 @@ const Events = () => {
             {ListEvent && ListEvent.map((event, index) => {
                 return (
                    
-                        <Event className="col-md-4" event={event}  key={index} bookAlert={handleBookAlert}/>
+                        <Event className="col-md-4" 
+                        event={event}  
+                        key={index} 
+                        bookAlert={handleBookAlert} 
+                        deleteEvent={deleteEvente}
+                        />
                     
                 )
             }

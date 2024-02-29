@@ -3,17 +3,31 @@ import { useParams } from 'react-router-dom';
 import ListEvent from '../data/events.json';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
-
+import { getallEvents } from '../service/api';
+import { useState } from 'react';
 
 
 const EventDetails = () => {
+  const [event, setEvent] = useState({});
 
-    const { name } = useParams();
-    console.log(name);
+    const { id } = useParams();
+    console.log(id);
+
+    const fetchevent = async () => {
+      const response = await getallEvents(id);
+      setEvent(response.data);
+      console.log(response.data);
+    }
+
+
+    useEffect(() => {
+      
+      fetchevent(id);
+    }
+    , [id]);
 
     
-    const event = ListEvent.find((event) => event.name === name);
-    console.log(event.img);
+   
 
     return (
         <div>
