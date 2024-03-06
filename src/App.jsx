@@ -4,6 +4,7 @@ import './App.css'
 import React , { Suspense } from 'react'
 import NavigationBar from './components/Navbar';
 import AddEvent from './components/addEvent';
+import EditEvent from './components/editEvent';
 
 const Events = React.lazy(() => import('./components/Events'));
 const EventDetails = React.lazy(() => import('./components/EventDetails'));
@@ -23,6 +24,7 @@ function App() {
           <Route index element={<Events />} />
           <Route path="details/:id" element={<EventDetails />} />
           <Route path='add' element={<AddEvent />} />
+          <Route path='edit/:id' element={<EditEvent />} />
         </Route>
         <Route path='*' element={<NotFound />} />
       </Routes>

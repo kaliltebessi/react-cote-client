@@ -2,12 +2,12 @@ import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link , useNavigate } from 'react-router-dom';
 
 
 const Event = (props) => {
   const [event, setEvent] = useState(props.event);
-  
+  const navigate = useNavigate();
  
 
   const buyTicket = () => {
@@ -34,6 +34,10 @@ const Event = (props) => {
     });
   }
 
+  const editEvent = (id) => {
+    navigate(`/events/edit/${id}`);
+  }
+
   return(
     <Card style={{ width: '18rem' }}>
       <Card.Img variant="top" src={event.nbTickets===0?"images/sold_out.png" :`images/${event.img}`} />
@@ -54,6 +58,8 @@ const Event = (props) => {
         <Button variant="secondary" onClick={setlike} >{event.like ? 'like' : 'dislike'}</Button>
         <Button variant="primary" onClick={buyTicket} disabled={event.nbTickets === 0 ? true : false}>Book an Event</Button>
         <Button variant="danger" onClick={() => props.deleteEvent(event.id)}>Delete</Button>
+        <Button variant="warning" onClick={() => editEvent(event.id)}>Edit</Button>
+
       </Card.Body>
     </Card>
   );
