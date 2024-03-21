@@ -1,59 +1,50 @@
-
-import { Button, Container, Form } from "react-bootstrap";
 import { useState } from "react";
-import { addEvent } from "../service/api";
-import { useNavigate } from 'react-router-dom';
-
+import { Button, Container, Form } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { addEvent } from "../services/api";
+import { useDispatch } from "react-redux";
+import { addEventReducer } from "../redux/slices/eventsSlice";
 
 export default function AddEvent() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [eventItem, setEventItem] = useState({
     name: "",
     description: "",
+    img: "",
     price: 0,
     nbTickets: 0,
-    img: "",
+    nbParticipants: 0,
+    like: false,
   });
 
-  const handleInputChange = (e) => {
-    setEventItem({ ...eventItem,
+  const onValueChange = (e) => {
+    setEventItem({ ...eventItem, [e.target.name]: e.target.value });
+  };
+  const onFileHandle = (e) => {
+    setEventItem({ ...eventItem, [e.target.name]: e.target.files[0].name });
+  };
 
-         [e.target.name]: e.target.value ,
-         [e.target.description]: e.target.value,
-         [e.target.price]: e.target.value,
-         [e.target.nbTickets]: e.target.value,
-         [e.target.img]: e.target.value,
-
-         
-        });
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await addEvent(eventItem);
-      navigate('/events');  // navigate to /events
-    } catch (error) {
-      console.log(error);
+  const addNewEvent = async () => {
+    const eventResult = await addEvent(eventItem);
+    dispatch(addEventReducer(eventResult.data));
+    if (eventResult.status === 201) {
+      navigate("/events");
     }
-  }
-
-
-  const handleFileChange = (e) => {
-    setEventItem({ ...eventItem, img: e.target.files[0] });
-  }
+  };
 
   return (
     <Container style={{ marginTop: "30px" }}>
       <h2>Add a new Event to your Event List</h2>
-      <Form onChange={handleInputChange} onSubmit={handleSubmit} >
+      <Form>
         <Form.Group className="mb-3">
           <Form.Label>Name</Form.Label>
           <Form.Control
+            onChange={(e) => onValueChange(e)}
             name="name"
+            value={eventItem.name}
             type="text"
             placeholder="Enter a Name"
-            value={eventItem.name}
           />
         </Form.Group>
         <Form.Group className="mb-3">
@@ -62,6 +53,7 @@ export default function AddEvent() {
             as="textarea"
             rows={3}
             placeholder="Enter description "
+            onChange={(e) => onValueChange(e)}
             name="description"
             value={eventItem.description}
           />
@@ -70,6 +62,7 @@ export default function AddEvent() {
           <Form.Label>Price</Form.Label>
           <Form.Control
             type="number"
+            onChange={(e) => onValueChange(e)}
             name="price"
             value={eventItem.price}
           />
@@ -78,6 +71,7 @@ export default function AddEvent() {
           <Form.Label>Number of Tickets</Form.Label>
           <Form.Control
             type="number"
+            onChange={(e) => onValueChange(e)}
             name="nbTickets"
             value={eventItem.nbTickets}
           />
@@ -86,14 +80,14 @@ export default function AddEvent() {
           <Form.Label>Image</Form.Label>
           <Form.Control
             type="file"
+            onChange={(e) => onFileHandle(e)}
             name="img"
-            onChange={handleFileChange}
           />
         </Form.Group>
-        <Button variant="primary" type="submit" >
+        <Button variant="primary" onClick={addNewEvent}>
           Add an Event
         </Button>
-        <Button  variant="secondary">
+        <Button onClick={() => navigate("/events")} variant="secondary">
           Cancel
         </Button>
       </Form>

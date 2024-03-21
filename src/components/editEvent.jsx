@@ -1,111 +1,106 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
 import { Button, Container, Form } from "react-bootstrap";
-import { getallEvents, editEvent } from '../service/api';
+import { useNavigate, useParams } from "react-router-dom";
+import { editEvent, getallEvents } from "../services/api";
+import { useDispatch } from "react-redux";
+import { updateEventReducer } from "../redux/slices/eventsSlice";
 
-const EditEvent = () => {
+export default function editEvent() {
+  const navigate = useNavigate();
+  const param = useParams();
+  const dispatch =  useDispatch();
+
   const [eventItem, setEventItem] = useState({
     name: "",
     description: "",
+    img: "",
     price: 0,
     nbTickets: 0,
-    img: "",
+    nbParticipants: 0,
+    like: false,
   });
-
-  const { id } = useParams();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEvent = async () => {
-      try {
-        const event = await getallEvents(id);
-        setEventItem(event.data);
-        console.log(event.data);
-      } catch (error) {
-        console.log(error);
-      }
-    }
+      const eventResult = await getallEvents(param.id);
+      setEventItem(eventResult.data);
+    };
     fetchEvent();
-  }, [id]);
+  }, []);
 
-  const handleInputChange = (e) => {
+  const onValueChange = (e) => {
     setEventItem({ ...eventItem, [e.target.name]: e.target.value });
-  }
+  };
+  const onFileHandle = (e) => {
+    setEventItem({ ...eventItem, [e.target.name]: e.target.files[0].name });
+  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await editEvent(id, eventItem);
-      navigate('/events');
-    } catch (error) {
-      console.log(error);
+  const updateEvent = async () => {
+    const eventResult = await editEvent(param.id, eventItem);
+    dispatch(updateEventReducer(eventResult.data));
+    if (eventResult.status === 200) {
+      navigate("/events");
     }
-  }
-
-  const handleFileChange = (e) => {
-    setEventItem({ ...eventItem, img: e.target.files[0] });
-  }
+  };
 
   return (
     <Container style={{ marginTop: "30px" }}>
-      <h2>Edit Event</h2>
-      <Form onChange={handleInputChange} onSubmit={handleSubmit}>
-  <Form.Group className="mb-3">
-    <Form.Label>Name</Form.Label>
-    <Form.Control
-      name="name"
-      type="text"
-      placeholder="Enter a Name"
-      value={eventItem.name}
-    />
-  </Form.Group>
-  <Form.Group className="mb-3">
-    <Form.Label>Description</Form.Label>
-    <Form.Control
-      as="textarea"
-      rows={3}
-      placeholder="Enter description "
-      name="description"
-      value={eventItem.description}
-    />
-  </Form.Group>
-  <Form.Group className="mb-3">
-    <Form.Label>Price</Form.Label>
-    <Form.Control
-      type="number"
-      name="price"
-      value={eventItem.price}
-    />
-  </Form.Group>
-  <Form.Group className="mb-3">
-    <Form.Label>Number of Tickets</Form.Label>
-    <Form.Control
-      type="number"
-      name="nbTickets"
-      value={eventItem.nbTickets}
-    />
-  </Form.Group>
-  <Form.Group className="mb-3">
-  <Form.Label>Number of Participants</Form.Label>
-  <Form.Control
-    type="number"
-    name="nbParticipants"
-    value={eventItem.nbParticipants}
-  />
-</Form.Group>
-  <Form.Group className="mb-3">
-    <Form.Label>Image</Form.Label>
-    <Form.Control
-      type="file"
-      name="img"
-      onChange={handleFileChange}
-    />
-  </Form.Group>
-  <Button variant="primary" type="submit">Update Event</Button>
-  <Button variant="secondary" onClick={() => navigate('/events')}>Cancel</Button>
-</Form>
+      <h2>Modify {eventItem.name} </h2>
+      <Form>
+        <Form.Group className="mb-3">
+          <Form.Label>Name</Form.Label>
+          <Form.Control
+            onChange={(e) => onValueChange(e)}
+            name="name"
+            value={eventItem.name}
+            type="text"
+            placeholder="Enter a Name"
+          />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Description</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={3}
+            placeholder="Enter description "
+            onChange={(e) => onValueChange(e)}
+            name="description"
+            value={eventItem.description}
+          />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Price</Form.Label>
+          <Form.Control
+            type="number"
+            onChange={(e) => onValueChange(e)}
+            name="price"
+            value={eventItem.price}
+          />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Number of Tickets</Form.Label>
+          <Form.Control
+            type="number"
+            onChange={(e) => onValueChange(e)}
+            name="nbTickets"
+            value={eventItem.nbTickets}
+          />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Image</Form.Label>
+          <Form.Control
+            type="file"
+            onChange={(e) => onFileHandle(e)}
+            name="img"
+          />
+        </Form.Group>
+        <Button variant="primary" onClick={updateEvent}>
+          Update
+        </Button>
+        <Button onClick={() => navigate("/events")} variant="secondary">
+          Cancel
+        </Button>
+      </Form>
     </Container>
   );
 }
-
-export default EditEvent;

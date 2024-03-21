@@ -1,94 +1,72 @@
+import React, { useEffect, useState } from "react";
+import Event from "./Event";
+import Row from "react-bootstrap/Row";
+import Alert from "react-bootstrap/Alert";
+import { deleteEvent, getallEvents } from "../services/api";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteEventReducer, selectEvents } from "../redux/slices/eventsSlice";
 
-import React, { useEffect, useState } from 'react';
-import Event from './Event';
-import { getallEvents } from '../service/api';
-import { deleteEvent } from '../service/api';
-const Events = () => {
+export default function Events() {
+  //const [eventList, setEventList] = useState([]);
+  //const [eventList , error ] = useSelector(selectEvents);
+  const dispatch = useDispatch();
+  const eventList = useSelector( state => state.events.events)
+  const [isWelcome, setIsWelcome] = useState(true);
+  const [isShowBuyAlert, setIsShowBuyAlert] = useState(false);
 
-  const [bookAlert , setBookAlert] = useState(false);
-
-  const [showWelcome, setShowWelcome] = useState(false); 
-  const [ListEvent, setListEvent] = useState(null);
-
- useEffect(() => {
-    setShowWelcome(true);
-    setTimeout(() => {setShowWelcome(false);}, 3000);
-    return () => {
-      console.log('componentWillUnmount');
-      
-    }
-  }, []);
-
-  const deleteEvente = async (id) => { 
-    try {
-      await deleteEvent(id);
-      setListEvent(ListEvent.filter((event) => event.id !== id));
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-
-
-
-  const fetchEvents = async () => {
-    try {
-      const events = await getallEvents();
-      setListEvent(events.data);
-      console.log(data);
-    } catch (error) {
-      console.log(error);
-    }
-
-  }
+  // useEffect(() => {
+  //   const fetchEvents = async () => {
+  //     const eventsResult = await getallEvents();
+  //     setEventList(eventsResult.data);
+  //   };
+  //   fetchEvents();
+  // }, []);
 
   useEffect(() => {
-    try {
-      fetchEvents();
-    } catch (error) {
-      console.log(error);
-    }
+    const isWelcomeTimeout = setTimeout(() => {
+      setIsWelcome(false);
+    }, 3000);
+
+    return () => {
+      clearTimeout(isWelcomeTimeout);
+    };
   }, []);
 
-
-
-
-  const handleBookAlert = () => {
-    setBookAlert(true);
-
+  const showBuyAlert = () => {
+    setIsShowBuyAlert(true);
     setTimeout(() => {
-      setBookAlert(false);
-    }, 3000);
-  }
+      setIsShowBuyAlert(false);
+    }, 2000);
+  };
 
-
-
+  const handleDelete = async (eventId) => {
+    await deleteEvent(eventId);
+   //setEventList(eventList.filter((eventItem) => eventItem.id !== eventId));
+    dispatch(deleteEventReducer(eventId));
+  };
 
   return (
-    
-    <div className="row">
-      
-        {showWelcome && <div className="alert alert-success">Welcome to our events</div>}
-
-
-            {ListEvent && ListEvent.map((event, index) => {
-                return (
-                   
-                        <Event className="col-md-4" 
-                        event={event}  
-                        key={index} 
-                        bookAlert={handleBookAlert} 
-                        deleteEvent={deleteEvente}
-                        />
-                    
-                )
-            }
-      
-
-            )}
-            {bookAlert && <div className="alert alert-success">ticket booked !!</div>}
-            
+    <div>
+      {isWelcome && (
+        <Alert style={{ width: "70%", marginBottom: 40 }} variant="success">
+          Hey welcome to Esprit Events
+        </Alert>
+      )}
+      <Row xs={1} md={4} className="g-4">
+        {eventList.map((eventItem, index) => (
+          <Event
+            key={index}
+            event={eventItem}
+            showBuyAlert={showBuyAlert}
+            onDelete={handleDelete}
+          />
+        ))}
+      </Row>
+      {isShowBuyAlert && (
+        <Alert style={{ width: "70%", marginTop: 20 }} variant="primary">
+          You have booked an event
+        </Alert>
+      )}
     </div>
   );
 }
-export default Events;
